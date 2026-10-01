@@ -36,7 +36,7 @@ layoutClass: gap-8
 zoom: 0.9
 ---
 
-# Let’s tell the story of React
+# Let’s tell this story through React
 
 ::left::
 

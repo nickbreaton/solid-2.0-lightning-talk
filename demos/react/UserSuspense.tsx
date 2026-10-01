@@ -7,23 +7,23 @@ export default function Demo() {
   const [client] = useState(() => new QueryClient())
   return (
     <QueryClientProvider client={client}>
-      <App id={1} />
+      <App userId={1} />
     </QueryClientProvider>
   )
 }
 
-function App({ id }: { id: number }) {
+function App({ userId }: { userId: number }) {
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <User id={id} />
+      <User userId={userId} />
     </Suspense>
   )
 }
 
-function User({ id }: { id: number }) {
+function User({ userId }: { userId: number }) {
   const { data: user } = useSuspenseQuery({
-    queryKey: ['user', id],
-    queryFn: () => fetchUser(id),
+    queryKey: ['user', userId],
+    queryFn: () => fetchUser(userId),
   })
 
   return <p>{user.name}</p>

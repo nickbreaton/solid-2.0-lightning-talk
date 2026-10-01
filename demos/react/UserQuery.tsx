@@ -7,15 +7,15 @@ export default function Demo() {
   const [client] = useState(() => new QueryClient())
   return (
     <QueryClientProvider client={client}>
-      <User id={1} />
+      <App userId={1} />
     </QueryClientProvider>
   )
 }
 
-function User({ id }: { id: number }) {
+function App({ userId }: { userId: number }) {
   const { data: user, isLoading } = useQuery({
-    queryKey: ['user', id],
-    queryFn: () => fetchUser(id),
+    queryKey: ['user', userId],
+    queryFn: () => fetchUser(userId),
   })
 
   if (isLoading) return <p>Loading...</p>

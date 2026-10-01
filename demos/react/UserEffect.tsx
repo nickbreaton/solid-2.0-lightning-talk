@@ -3,20 +3,20 @@ import { fetchUser, type User as UserData } from '../api'
 
 // Slide 2, step 1: state → effect → fetch → set state → loading branch.
 export default function Demo() {
-  return <User id={1} />
+  return <App userId={1} />
 }
 
-function User({ id }: { id: number }) {
+function App({ userId }: { userId: number }) {
   const [user, setUser] = useState<UserData>()
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     setIsLoading(true)
-    fetchUser(id).then(user => {
+    fetchUser(userId).then(user => {
       setUser(user)
       setIsLoading(false)
     })
-  }, [id])
+  }, [userId])
 
   if (isLoading) return <p>Loading...</p>
 

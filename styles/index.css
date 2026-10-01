@@ -74,8 +74,9 @@
   transition: opacity 150ms;
 }
 .demo select option { color: black; }
-.demo .comments { margin: 0.5rem 0 0; padding-left: 1rem; font-size: 0.9em; }
-.demo .comments li { margin: 0.2rem 0; }
+.demo p { margin: 0; }
+.demo ul { margin: 0.5rem 0 0; padding-left: 1.25rem; list-style: disc; font-size: 0.9em; }
+.demo ul li { margin: 0.2rem 0; }
 .demo .cascade {
   display: grid;
   grid-template-columns: auto auto 1fr;

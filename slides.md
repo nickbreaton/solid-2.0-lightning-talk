@@ -43,17 +43,17 @@ zoom: 0.9
 
 ````md magic-move {lines: true}
 ```tsx
-function User({ id }) {
+function App({ userId }) {
   const [user, setUser] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setIsLoading(true);
-    fetchUser(id).then((user) => {
+    fetchUser(userId).then((user) => {
       setUser(user);
       setIsLoading(false);
     });
-  }, [id]);
+  }, [userId]);
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -64,10 +64,10 @@ function User({ id }) {
 ```tsx
 import { useQuery } from "@tanstack/react-query";
 
-function User({ id }) {
+function App({ userId }) {
   const { data: user, isLoading } = useQuery({
-    queryKey: ["user", id],
-    queryFn: () => fetchUser(id),
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId),
   });
 
   if (isLoading) return <p>Loading...</p>;
@@ -79,21 +79,21 @@ function User({ id }) {
 ```tsx
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-function App({ id }) {
-  return (
-    <Suspense fallback={<p>Loading...</p>}>
-      <User id={id} />
-    </Suspense>
-  );
-}
-
-function User({ id }) {
+function User({ userId }) {
   const { data: user } = useSuspenseQuery({
-    queryKey: ["user", id],
-    queryFn: () => fetchUser(id),
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId),
   });
 
   return <p>{user.name}</p>;
+}
+
+function App({ userId }) {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <User userId={userId} />
+    </Suspense>
+  );
 }
 ```
 ````
@@ -121,41 +121,43 @@ We need some data. So we start with state and an Effect. Mount — or ID changes
 ---
 layout: two-cols-header
 layoutClass: gap-8
-zoom: 0.8
+zoom: 0.75
 ---
 
-# The tree becomes the request graph
+# The _component_ tree becomes the request graph
 
 ::left::
 
 <div class="code-label" data-framework="react">
 
-```tsx {all|2|12|18|25}
-function Page() {
-  const [id, setId] = useState(1);
-  return (
-    <Suspense fallback={<Spinner />}>
-      <Article id={id} />
-    </Suspense>
-  );
+```tsx
+function Posts({ userId }) {
+  const { data: posts } = useSuspenseQuery({
+    queryKey: ["posts", userId],
+    queryFn: () => fetchPosts(userId),
+  });
+  return <ul>{posts.map((p) => <li key={p.id}>{p.title}</li>)}</ul>;
 }
 
-function Article({ id }) {
-  const { data } = useSuspenseQuery(articleQuery(id));
-
+function User({ userId }) {
+  const { data: user } = useSuspenseQuery({
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId),
+  });
   return (
     <>
-      <ArticleBody data={data} />
-      <Suspense fallback={<Spinner />}>
-        <Comments id={id} />
-      </Suspense>
+      <p>{user.name}</p>
+      <Posts userId={userId} />
     </>
   );
 }
 
-function Comments({ id }) {
-  const { data } = useSuspenseQuery(commentsQuery(id));
-  return <CommentList data={data} />;
+function App({ userId }) {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <User userId={userId} />
+    </Suspense>
+  );
 }
 ```
 
@@ -164,14 +166,14 @@ function Comments({ id }) {
 ::right::
 
 <div>
-  <Demo name="react/Waterfall" :height="150" />
+  <Demo name="react/Waterfall" :height="88" />
   <Network :scale="2400" />
 </div>  
 
 <!--
 [1:00–1:30]
 
-Now somebody adds comments. Comments don't depend on the article response — we already have the ID. But Article suspends before Comments mounts. So the component tree accidentally serialized two independent requests.
+Same App, same User as before. Now somebody adds the user's posts. Posts don't depend on the user response — we already have the ID. But User suspends before Posts mounts. So the component tree accidentally serialized two independent requests.
 
 (TanStack's docs call this a nested component waterfall.)
 
@@ -183,6 +185,7 @@ DON'T say "Suspense always waterfalls" or "there's no solution". Next slide is t
 ---
 layout: two-cols-header
 layoutClass: gap-8
+zoom: 0.68
 ---
 
 # React can fix it
@@ -191,14 +194,36 @@ layoutClass: gap-8
 
 <div class="code-label" data-framework="react">
 
-```tsx {3}
-function Page() {
-  const [id, setId] = useState(1);
-  usePrefetchQuery(commentsQuery(id));
+```tsx {all|23-26}
+function Posts({ userId }) {
+  const { data: posts } = useSuspenseQuery({
+    queryKey: ["posts", userId],
+    queryFn: () => fetchPosts(userId),
+  });
+  return <ul>{posts.map((p) => <li key={p.id}>{p.title}</li>)}</ul>;
+}
 
+function User({ userId }) {
+  const { data: user } = useSuspenseQuery({
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId),
+  });
   return (
-    <Suspense fallback={<ArticleSkeleton />}>
-      <Article id={id} />
+    <>
+      <p>{user.name}</p>
+      <Posts userId={userId} />
+    </>
+  );
+}
+
+function App({ userId }) {
+  usePrefetchQuery({
+    queryKey: ["posts", userId],
+    queryFn: () => fetchPosts(userId),
+  });
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <User userId={userId} />
     </Suspense>
   );
 }
@@ -206,33 +231,19 @@ function Page() {
 
 </div>
 
-<div class="mt-6 text-lg leading-loose">
-
-✓ prefetch the descendant query<br>
-✓ hoist into `useSuspenseQueries`<br>
-✓ fetch in the router
-
-</div>
-
 ::right::
 
 <div>
-  <Demo name="react/Waterfall" :props="{ prefetch: true }" :height="150" />
+  <Demo name="react/Waterfall" :props="{ prefetch: true }" :height="88" />
   <Network :scale="2400" />
 </div>
-
-<v-click>
-
-<div class="quote mt-8">Something <em>above</em> Comments had to know what Comments needs.</div>
-
-</v-click>
 
 <!--
 [1:30–1:50]
 
 React can absolutely fix this. Prefetch it. Hoist the queries. Use useSuspenseQueries. Put the knowledge in your router.
 
-[click] But notice what fixed it: something above Comments had to know that Comments was going to need that data.
+[click] But notice what fixed it: App — two levels above Posts — had to know that Posts was going to need that data.
 
 Solid 2.0 starts from a different place.
 -->
@@ -242,44 +253,50 @@ layout: two-cols-header
 layoutClass: gap-8
 ---
 
-# First, plain state
+# Basic Solid state
 
 ::left::
 
 <div class="code-label" data-framework="solid">
 
-```tsx {1|3|5-7|all}
-const [count, setCount] = createSignal(0);
+````md magic-move
+```tsx {2|4|6-10|all}
+function Counter() {
+  const [count, setCount] = createSignal(0);
 
-const doubled = createMemo(() => count() * 2);
+  const doubled = createMemo(() => count() * 2);
 
-<button onClick={() => setCount(count() + 1)}>
-  {count()} × 2 = {doubled()}
-</button>
+  return (
+    <button onClick={() => setCount(count() + 1)}>
+      {count()} × 2 = {doubled()}
+    </button>
+  );
+}
 ```
 
+```tsx {6}
+function Counter() {
+  const [count, setCount] = createSignal(0);
+
+  const doubled = createMemo(() => count() * 2);
+
+  console.log(count());
+
+  return (
+    <button onClick={() => setCount(count() + 1)}>
+      {count()} × 2 = {doubled()}
+    </button>
+  );
+}
+```
+````
+
 </div>
-
-<v-click at="4">
-
-<div class="quote mt-6">Signals are values. Memos are values derived from values.</div>
-
-</v-click>
 
 ::right::
 
 <div>
   <Demo name="solid/Counter" />
-
-```text
-count()
- │
- ├────► doubled()
- │         │
- ▼         ▼
- <button>
-```
-
 </div>
 
 <!--
@@ -294,6 +311,8 @@ A signal is a value you can write. Like useState, except reading it is a functio
 DEMO: click the button a couple of times.
 
 [click] Hold onto that shape: signal → memo → UI.
+
+[click] console.log(count()) — how many times does this run? Once. The component function is setup, not a render function; only the things that read count() re-run.
 -->
 
 ---
@@ -307,62 +326,34 @@ layoutClass: gap-8
 
 <div class="code-label" data-framework="solid">
 
-```tsx {1|3-5|7-9|11-13}
-const [id, setId] = createSignal(1);
+```tsx
+function App(props) {
+  const user = createMemo(
+    () => fetchUser(props.userId)
+  );
 
-const user = createMemo(
-  () => fetchUser(id())
-);
-
-const name = createMemo(
-  () => `${user().first} ${user().last}`
-);
-
-<Loading fallback={<UserSkeleton />}>
-  <Profile name={name()} />
-</Loading>
+  return (
+    <Loading fallback={<p>Loading...</p>}>
+      <p>{user().name}</p>
+    </Loading>
+  );
+}
 ```
 
 </div>
 
-<v-click at="4">
-
-<div class="quote mt-6">Async isn't metadata on a fetch.<br>It's a property of a value in the graph.</div>
-
-</v-click>
-
 ::right::
 
 <div>
-
-```text
-id()
- │
- ▼
-user()          Promise<User> → User
- │
- ├────► name()
- │        │
- │        ▼
- └────► <Profile>   inside <Loading>
-```
-
+  <Demo name="solid/User" :height="28" />
 </div>
 
 <!--
 [1:50–2:30] — most important slide.
 
-Same shape as the counter: a signal, then a memo.
+Same user fetch as the React slide. In Solid 2, an ordinary memo can return a Promise. There's no resource object, no query hook: `user` is a memo that just doesn't know its answer yet.
 
-[click] But in Solid 2, an ordinary computation can return a Promise.
-
-There's no resource object here. `user` is a memo. It just happens to not know its answer yet.
-
-[click] And I can derive from it like any other value. If another computation reads it, that pending relationship continues through the graph.
-
-[click] If UI reads it before it's ready, <Loading> decides what the user sees. (Note: Loading, not Suspense.)
-
-[click] Async is no longer metadata attached to a special fetch primitive. It's a property of a value in the graph.
+Reading user() before it's ready is fine. <Loading> decides what the user sees in the meantime. (Note: Loading, not Suspense.)
 
 Nuance: this doesn't abolish causality. If request B truly needs A's result, it's still serial. The point is we aren't making component mount order define our data model.
 -->
@@ -370,6 +361,7 @@ Nuance: this doesn't abolish causality. If request B truly needs A's result, it'
 ---
 layout: two-cols-header
 layoutClass: gap-8
+zoom: 0.75
 ---
 
 # Same tree, no waterfall
@@ -378,26 +370,34 @@ layoutClass: gap-8
 
 <div class="code-label" data-framework="solid">
 
-```tsx {2-4|10|15-17}
-function Article(props) {
-  const article = createMemo(
-    () => fetchArticle(props.id)
+```tsx {24-26|13|17|2}
+function Posts(props) {
+  const posts = createMemo(() => fetchPosts(props.id));
+  return (
+    <ul>
+      <For each={posts()}>
+        {(p) => <li>{p.title}</li>}
+      </For>
+    </ul>
   );
+}
+
+function User(props) {
+  const user = createMemo(() => fetchUser(props.id));
   return (
     <>
-      <ArticleBody data={article()} />
-      <Loading fallback={<Spinner />}>
-        <Comments id={props.id} />
-      </Loading>
+      <p>{user().name}</p>
+      <Posts id={props.id} />
     </>
   );
 }
 
-function Comments(props) {
-  const comments = createMemo(
-    () => fetchComments(props.id)
+function App(props) {
+  return (
+    <Loading fallback={<p>Loading...</p>}>
+      <User id={props.id} />
+    </Loading>
   );
-  return <CommentList data={comments()} />;
 }
 ```
 
@@ -406,7 +406,7 @@ function Comments(props) {
 ::right::
 
 <div>
-  <Demo name="solid/Article" :height="150" />
+  <Demo name="solid/Posts" :height="88" />
   <Network :scale="2400" />
 </div>
 
@@ -419,7 +419,7 @@ Reading a value that isn't ready doesn't stop the rest of the tree from being bu
 <!--
 OPTIONAL — cut if running long.
 
-Same component shape as the React waterfall. Reading `article()` before it's ready doesn't halt construction of the tree below it, so Comments' memo starts its request immediately.
+Same User → Posts shape as the React waterfall. Reading `user()` before it's ready doesn't halt construction of the tree below it, so Posts' memo starts its request immediately.
 
 Careful wording: "the data sources don't need to be modeled as component-local fetch lifecycle". Not "Solid eliminates every waterfall".
 -->

@@ -5,62 +5,60 @@ import {
   usePrefetchQuery,
   useSuspenseQuery,
 } from '@tanstack/react-query'
-import { fetchArticle, fetchComments } from '../api'
+import { fetchPosts, fetchUser } from '../api'
 
-// Slides 3 & 4: a Suspenseful parent query and an *independent* child query.
-// With `prefetch`, the comments query is started above the boundary.
-
-const articleQuery = (id: number) => ({ queryKey: ['article', id], queryFn: () => fetchArticle(id) })
-const commentsQuery = (id: number) => ({ queryKey: ['comments', id], queryFn: () => fetchComments(id) })
-
+// Slides 3 & 4: slide 2's App → User, plus an *independent* child Posts query.
+// With `prefetch`, App starts the posts query above the boundary.
 export default function Demo({ prefetch = false }: { prefetch?: boolean }) {
-  const client = new QueryClient()
+  const [client] = useState(() => new QueryClient())
   return (
     <QueryClientProvider client={client}>
-      {prefetch ? <PrefetchingPage /> : <Page />}
+      {prefetch ? <PrefetchingApp userId={1} /> : <App userId={1} />}
     </QueryClientProvider>
   )
 }
 
-function Page() {
-  const [id] = useState(1)
-  return <Boundary id={id} />
-}
-
-function Boundary({ id }: { id: number }) {
+function App({ userId }: { userId: number }) {
   return (
-    <Suspense fallback={<div className="card skeleton">Loading article…</div>}>
-      <Article id={id} />
+    <Suspense fallback={<p>Loading...</p>}>
+      <User userId={userId} />
     </Suspense>
   )
 }
 
-function PrefetchingPage() {
-  const [id] = useState(1)
-  usePrefetchQuery(commentsQuery(id))
-  return <Boundary id={id} />
+function PrefetchingApp({ userId }: { userId: number }) {
+  usePrefetchQuery({
+    queryKey: ['posts', userId],
+    queryFn: () => fetchPosts(userId),
+  })
+
+  return <App userId={userId} />
 }
 
-function Article({ id }: { id: number }) {
-  const { data } = useSuspenseQuery(articleQuery(id))
+function User({ userId }: { userId: number }) {
+  const { data: user } = useSuspenseQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUser(userId),
+  })
+
   return (
-    <div className="card">
-      <strong>{data.title}</strong>
-      <Suspense fallback={<div className="muted">Loading comments…</div>}>
-        <Comments id={id} />
-      </Suspense>
-    </div>
+    <>
+      <p>{user.name}</p>
+      <Posts userId={userId} />
+    </>
   )
 }
 
-function Comments({ id }: { id: number }) {
-  const { data } = useSuspenseQuery(commentsQuery(id))
+function Posts({ userId }: { userId: number }) {
+  const { data: posts } = useSuspenseQuery({
+    queryKey: ['posts', userId],
+    queryFn: () => fetchPosts(userId),
+  })
+
   return (
-    <ul className="comments">
-      {data.map(c => (
-        <li key={c.id}>
-          <b>@{c.author}</b> {c.text}
-        </li>
+    <ul>
+      {posts.map(p => (
+        <li key={p.id}>{p.title}</li>
       ))}
     </ul>
   )

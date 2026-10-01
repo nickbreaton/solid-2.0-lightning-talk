@@ -66,23 +66,14 @@ export function renameUser(id: number, name: string): Promise<void> {
   })
 }
 
-// ---------------------------------------------------------------- article
+// ---------------------------------------------------------------- posts
 
-export type Article = { id: number; title: string; body: string }
-export type Comment = { id: number; author: string; text: string }
+export type Post = { id: number; title: string }
 
-export function fetchArticle(id: number): Promise<Article> {
-  return request('article', 1000, () => ({
-    id,
-    title: 'Async creeps in',
-    body: 'Every step is better. But async keeps spreading into the structure of our application.',
-  }))
-}
-
-export function fetchComments(id: number): Promise<Comment[]> {
-  return request('comments', 1000, () => [
-    { id: 1, author: 'ryan', text: 'Put it in the graph.' },
-    { id: 2, author: 'dan', text: 'Have you tried startTransition?' },
+export function fetchPosts(userId: number): Promise<Post[]> {
+  return request(`posts ${userId}`, 900, () => [
+    { id: 1, title: 'Notes on the Analytical Engine' },
+    { id: 2, title: 'Put it in the graph' },
   ])
 }
 

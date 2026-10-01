@@ -13,11 +13,12 @@ drawings:
   persist: false
 ---
 
+<img src="/solid-logo.png" alt="Solid logo" class="mx-auto -mt-12 mb-6 w-32" />
+
 # Solid 2.0
 
-<div class="lead">A game changer for managing async state</div>
+<div class="lead">A truely innovate update in<br>handling async state</div>
 
-<img src="/solid-logo.png" alt="Solid logo" class="mx-auto mt-12 w-40" />
 
 ---
 layout: two-cols-header
@@ -411,20 +412,23 @@ layoutClass: gap-8
 
 <div class="code-label" data-framework="solid">
 
-```tsx {1-2|4-6|9|10-12|all}
-const [id, setId] = createSignal(1);
-const user = createMemo(() => fetchUser(id()));
+```tsx {2-3|10-12|7|13|all}
+function App() {
+  const [userId, setUserId] = createSignal(1);
+  const user = createMemo(() => fetchUser(userId()));
 
-<button onClick={() => setId(id() + 1)}>
-  Next user
-</button>
-
-<Loading fallback={<Skeleton />}>
-  <div class={{ dim: isPending(() => user()) }}>
-    {user().name}
-  </div>
-</Loading>
-Selected: {latest(id)}
+  return (
+    <Loading fallback={<p>Loading...</p>}>
+      <p class={{ pending: isPending(() => user()) }}>
+        {user().name}
+      </p>
+      <button onClick={() => setUserId((id) => id + 1)}>
+        Next user
+      </button>
+      <p>Selected: {latest(userId)}</p>
+    </Loading>
+  );
+}
 ```
 
 </div>
@@ -436,232 +440,15 @@ Selected: {latest(id)}
   <Network :scale="2400" />
 </div>
 
-<div class="quote mt-8 text-xl!">
-
-In React, we mark which update is a transition.<br>
-In Solid 2, the graph knows this write is waiting on async work.
-
-</div>
-
----
-layout: two-cols-header
-layoutClass: gap-8
----
-
-# Writes use the same model
-
-::left::
-
-<div class="code-label" data-framework="solid">
-
-````md magic-move {lines: true}
-```tsx {*|1|2|4|6}
-const rename = action(function* (name) {
-  affects(user);
-
-  yield api.rename(id(), name);
-
-  refresh(user);
-});
-```
-
-```tsx
-const [user, setUser] = createOptimisticStore(
-  () => fetchUser(id()),
-  seed
-);
-
-const rename = action(function* (name) {
-  setUser(u => {
-    u.name = name;
-  });
-
-  yield api.rename(id(), name);
-
-  refresh(user);
-});
-```
-````
-
-</div>
-
-<div class="mt-6 opacity-50 text-sm font-mono">action · affects · refresh · createOptimisticStore</div>
-
-::right::
-
-<div>
-  <Demo name="solid/Rename" />
-  <Network :scale="3000" />
-</div>
-
-<v-click at="6">
-
-<div class="quote mt-8 text-xl!">Optimistic state, mutation status, invalidation, transition — different views of one transaction.</div>
-
-</v-click>
-
----
-layout: two-cols-header
-layoutClass: gap-8
----
-
-# Synchronization creeps in too
-
-::left::
-
-<div class="code-label" data-framework="react">
-
-```tsx
-const [name, setName] = useState(user.name);
-
-useEffect(() => {
-  setName(user.name);
-}, [user.name]);
-```
-
-</div>
-
-<div class="text-xs opacity-50 mt-1 mb-6">React alternatives: derive · key · restructure</div>
-
-<v-click>
-
-<div class="code-label" data-framework="solid">
-
-```tsx
-const [name, setName] = createSignal(
-  () => user().name
-);
-```
-
-</div>
-
-<div class="text-sm opacity-70">derived, but writable</div>
-
-</v-click>
-
-::right::
-
-<div class="flex flex-col gap-8">
-  <Demo name="react/DraftEffect" />
-  <Demo v-click="1" name="solid/Draft" />
-</div>
-
----
-layout: two-cols-header
-layoutClass: gap-8
----
-
-# Put it all together
-
-::left::
-
-<div class="code-label" data-framework="solid">
-
-```tsx {1-2|4-6|8-10|12-14|16-18|all}
-const [state, setState] =
-  createSignal("NC");
-
-const counties = createMemo(
-  () => fetchCounties(state())
-);
-
-const [county, setCounty] = createSignal(
-  () => counties()[0].id
-);
-
-const cities = createMemo(
-  () => fetchCities(county())
-);
-
-const [city, setCity] = createSignal(
-  () => cities()[0].id
-);
-```
-
-</div>
-
-::right::
-
-<div>
-  <Demo name="solid/Cascade" :height="172" />
-  <Network :scale="2400" />
-</div>
-
-<v-click at="6">
-
-<div class="quote mt-8">Where are the Effects?</div>
-<div class="text-xl mt-2 opacity-80">The dependencies are the program.</div>
-
-</v-click>
-
 ---
 layout: center
 class: text-center
 ---
 
-<div class="closing-grid inline-grid text-left mt-6">
-  <b>ASYNC</b><span class="opacity-70">not a side channel</span>
-  <b>SYNCHRONIZATION</b><span class="opacity-70">not an Effect</span>
-  <b>TRANSITIONS</b><span class="opacity-70">not a wrapper</span>
-  <b>MUTATIONS</b><span class="opacity-70">not a separate universe</span>
-</div>
+# And so much more…
 
-<v-click>
+<div class="lead mt-6">
 
-<div class="quote mt-14 text-4xl!">Put the relationships in the graph.</div>
+Read <a href="https://www.solidjs.com/blog/solid-2-0-rc-the-big-reveal" target="_blank">Solid 2.0 RC: The Big &lt;Reveal&gt;</a>
 
-</v-click>
-
----
-layout: two-cols-header
-layoutClass: gap-8
----
-
-# Appendix: I actually used this
-
-::left::
-
-<div class="code-label" data-framework="solid">
-
-```tsx
-function createCookieSignal(name, fallback) {
-  const [value, setValue] = createOptimistic(async function* () {
-    yield await readCookie(name, fallback);
-    for await (const change of cookieChanges(name)) {
-      yield change;
-    }
-  });
-
-  const set = action(function* (next) {
-    setValue(() => next);
-    yield cookieStore.set(name, serialize(next));
-    yield until(() => value() === next);
-  });
-
-  return [value, set];
-}
-```
-
-</div>
-
-::right::
-
-<div>
-
-<div class="code-label" data-framework="solid">
-
-```tsx
-const [latinOnly, setLatinOnly] =
-  createCookieSignal("latinOnly", true);
-```
-
-</div>
-
-<div class="mt-6 text-lg opacity-80">
-
-SSR'd from a cookie, hydrated, live-updated from Cookie Store events, optimistically writable…
-
-**…and it reads like state.**
-
-</div>
 </div>

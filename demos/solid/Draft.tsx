@@ -16,7 +16,7 @@ export default function Demo() {
           <div class="muted">upstream: {user().name}</div>
         </div>
       </Loading>
-      <button onClick={() => setId(id() + 1)}>Next user</button>
+      <button onClick={() => setId(id => id + 1)}>Next user</button>
     </div>
   )
 }

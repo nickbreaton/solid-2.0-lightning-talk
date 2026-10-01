@@ -2,7 +2,7 @@
 import { createMemo, createSignal, isPending, latest, Loading } from 'solid-js'
 import { fetchUser } from '../api'
 
-// Slide 6: change the input to an async value. No startTransition anywhere.
+// Slide 8: change the input to an async value. No startTransition anywhere.
 export default function Demo() {
   const [id, setId] = createSignal(1)
   const user = createMemo(() => fetchUser(id()))
@@ -17,7 +17,7 @@ export default function Demo() {
         </div>
       </Loading>
       <div class="row">
-        <button onClick={() => setId(id() + 1)}>Next user</button>
+        <button onClick={() => setId(id => id + 1)}>Next user</button>
         <span class="muted">selected: {latest(id)} · committed: {id()}</span>
       </div>
     </div>

@@ -31,7 +31,31 @@ onBeforeUnmount(() => {
   cancelAnimationFrame(raf)
 })
 
-const width = computed(() => Math.max(props.scale, ...entries.value.map(e => e.end ?? now.value)))
+// Idle time (no request in flight) is cut out of the timeline: real time is
+// mapped onto "busy time", so gaps like waiting for a click collapse to zero.
+const busy = computed(() => {
+  const spans = entries.value
+    .map(e => [e.start, e.end ?? now.value] as [number, number])
+    .sort((a, b) => a[0] - b[0])
+  const merged: [number, number][] = []
+  for (const [start, end] of spans) {
+    const last = merged[merged.length - 1]
+    if (last && start <= last[1]) last[1] = Math.max(last[1], end)
+    else merged.push([start, end])
+  }
+  return merged
+})
+
+function compress(t: number) {
+  let total = 0
+  for (const [start, end] of busy.value) {
+    if (t <= start) break
+    total += Math.min(t, end) - start
+  }
+  return total
+}
+
+const width = computed(() => Math.max(props.scale, ...busy.value.map(([, end]) => compress(end))))
 const pct = (ms: number) => `${(ms / width.value) * 100}%`
 </script>
 
@@ -45,7 +69,7 @@ const pct = (ms: number) => `${(ms / width.value) * 100}%`
         <span
           class="network-bar"
           :class="{ inflight: e.end === undefined }"
-          :style="{ left: pct(e.start), width: pct((e.end ?? now) - e.start) }"
+          :style="{ left: pct(compress(e.start)), width: pct(compress(e.end ?? now) - compress(e.start)) }"
         />
       </span>
     </div>

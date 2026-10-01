@@ -456,7 +456,7 @@ layoutClass: gap-8
 zoom: 0.8
 ---
 
-# Optimistic writes with actions
+# Transaction entanglement with actions
 
 ::left::
 
@@ -481,7 +481,7 @@ function App(props) {
       <ul class={{ pending: isPending(() => posts.length) }}>
         <For each={posts}>{(p) => <li>{p.title}</li>}</For>
       </ul>
-      <button onClick={() => addPost("Hello, Solid 2.0")}>
+      <button onClick={() => addPost("Live from avl.js ⚡")}>
         Add post
       </button>
     </Loading>
@@ -509,7 +509,7 @@ function App(props) {
       <ul>
         <For each={posts}>{(p) => <li>{p.title}</li>}</For>
       </ul>
-      <button onClick={() => addPost("Hello, Solid 2.0")}>
+      <button onClick={() => addPost("Live from avl.js ⚡")}>
         Add post
       </button>
     </Loading>

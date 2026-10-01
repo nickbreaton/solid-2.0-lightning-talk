@@ -22,7 +22,7 @@ function App(props: { userId: number }) {
       <ul class={{ pending: isPending(() => posts.length) }}>
         <For each={posts}>{p => <li>{p.title}</li>}</For>
       </ul>
-      <button onClick={() => addPost('Hello, Solid 2.0')}>Add post</button>
+      <button onClick={() => addPost('Live from avl.js ⚡')}>Add post</button>
     </Loading>
   )
 }

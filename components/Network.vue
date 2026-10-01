@@ -68,7 +68,7 @@ const pct = (ms: number) => `${(ms / width.value) * 100}%`
       <span class="network-track">
         <span
           class="network-bar"
-          :class="{ inflight: e.end === undefined }"
+          :class="{ inflight: e.end === undefined, failed: e.failed }"
           :style="{ left: pct(compress(e.start)), width: pct(compress(e.end ?? now) - compress(e.start)) }"
         />
       </span>

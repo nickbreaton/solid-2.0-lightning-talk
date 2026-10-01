@@ -99,6 +99,7 @@
 .network-track { position: relative; height: 0.6rem; }
 .network-bar { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: #22c55e; }
 .network-bar.inflight { background: #eab308; }
+.network-bar.failed { background: #ef4444; }
 
 /* ------------------------------------------------------------ diagrams */
 

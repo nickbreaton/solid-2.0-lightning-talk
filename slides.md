@@ -447,6 +447,83 @@ function App() {
 </div>
 
 ---
+layout: two-cols-header
+layoutClass: gap-8
+zoom: 0.8
+---
+
+# Optimistic writes with actions
+
+::left::
+
+<div class="code-label" data-framework="solid">
+
+````md magic-move {lines: false}
+```tsx {all|2-5|7|8|9|10|15}
+function App(props) {
+  const [posts] = createStore(
+    () => fetchPosts(props.userId),
+    []
+  );
+
+  const addPost = action(function* (title) {
+    affects(posts);
+    yield savePost(props.userId, title);
+    refresh(posts);
+  });
+
+  return (
+    <Loading fallback={<p>Loading...</p>}>
+      <ul class={{ pending: isPending(() => posts.length) }}>
+        <For each={posts}>{(p) => <li>{p.title}</li>}</For>
+      </ul>
+      <button onClick={() => addPost("Hello, Solid 2.0")}>
+        Add post
+      </button>
+    </Loading>
+  );
+}
+```
+
+```tsx {all|2|8-10}
+function App(props) {
+  const [posts, setPosts] = createOptimisticStore(
+    () => fetchPosts(props.userId),
+    []
+  );
+
+  const addPost = action(function* (title) {
+    setPosts((posts) => {
+      posts.push({ id: Date.now(), title });
+    });
+    yield savePost(props.userId, title);
+    refresh(posts);
+  });
+
+  return (
+    <Loading fallback={<p>Loading...</p>}>
+      <ul>
+        <For each={posts}>{(p) => <li>{p.title}</li>}</For>
+      </ul>
+      <button onClick={() => addPost("Hello, Solid 2.0")}>
+        Add post
+      </button>
+    </Loading>
+  );
+}
+```
+````
+
+</div>
+
+::right::
+
+<div>
+  <Demo :name="$clicks < 7 ? 'solid/AddPostPending' : 'solid/AddPost'" :height="200" />
+  <Network :scale="3000" />
+</div>
+
+---
 layout: center
 class: text-center
 ---

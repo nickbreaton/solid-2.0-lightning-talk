@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "slidev build",
-    "dev": "slidev --open",
+    "dev": "slidev --open --port 3030",
     "export": "slidev export",
     "deploy": "sh scripts/deploy.sh"
   },

@@ -1,0 +1,1 @@
+import{o as e}from"./slidev/two-cols-header-DV7XMSrB.js";import{a as t,c as n,l as r,r as i,s as a}from"./web-DxIfxm8O.js";var o=t(`<p>`),s=t(`<p>Loading...`);function c(){return n(l,{userId:1})}function l(t){let c=r(()=>e(t.userId));return n(a,{get fallback(){return s()},get children(){var e=o();return i(e,()=>c().name),e}})}export{c as default};

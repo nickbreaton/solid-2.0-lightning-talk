@@ -1,0 +1,1 @@
+import{a as e,d as t,l as n,r,t as i}from"./web-DxIfxm8O.js";var a=e(`<button> × 2 = <!>`);function o(){let[e,i]=t(0),o=n(()=>e()*2);console.log(e());var s=a(),c=s.firstChild,l=c.nextSibling;return s._$$click=()=>i(e()+1),r(s,e,c),r(s,o,l),s}i([`click`]);export{o as default};

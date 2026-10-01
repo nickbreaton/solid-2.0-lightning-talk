@@ -1,0 +1,1 @@
+import{c as e,i as t}from"./web-DxIfxm8O.js";function n(n,r,i={}){return t(()=>e(n,i),r)}export{n as mount};

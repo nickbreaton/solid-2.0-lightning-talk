@@ -283,12 +283,7 @@ layoutClass: gap-8
 
 <WordHighlight word="{user().name}" :until="2">
 
-```tsx {all|all|7,9} twoslash
-// @jsx: preserve
-// @jsxImportSource: @solidjs/web
-import { createMemo, Loading } from 'solid-js'
-import { fetchUser } from './demos/api'
-// ---cut---
+```tsx {all|all|7,9}
 function App(props) {
   const user = createMemo(
     () => fetchUser(props.userId)
@@ -427,12 +422,7 @@ layoutClass: gap-8
 
 <div class="code-label" data-framework="solid">
 
-```tsx {2-3|10-12|7|13|all} twoslash
-// @jsx: preserve
-// @jsxImportSource: @solidjs/web
-import { createMemo, createSignal, isPending, latest, Loading } from 'solid-js'
-import { fetchUser } from './demos/api'
-// ---cut---
+```tsx {2-3|10-12|7|13|all}
 function App() {
   const [userId, setUserId] = createSignal(1);
   const user = createMemo(() => fetchUser(userId()));

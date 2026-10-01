@@ -124,3 +124,15 @@
 .credit { font-size: 0.9rem; opacity: 0.45; }
 .credit a { border-bottom: none !important; color: inherit; }
 .credit a:hover { opacity: 1; text-decoration: underline; }
+
+/* Title slide GitHub link (top left), as subtle as the timer */
+.repo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 1.1rem;
+  opacity: 0.35;
+  border-bottom: none !important;
+  transition: opacity 150ms;
+}
+.repo-link:hover { opacity: 0.8; }

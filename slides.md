@@ -25,6 +25,10 @@ drawings:
   <a href="https://x.com/nickbreaton" target="_blank">@nickbreaton</a>
 </div>
 
+<a class="repo-link abs-tl m-4" href="https://github.com/nickbreaton/solid-2.0-lightning-talk" target="_blank" title="View on GitHub">
+  <carbon:logo-github />
+</a>
+
 
 ---
 layout: two-cols-header

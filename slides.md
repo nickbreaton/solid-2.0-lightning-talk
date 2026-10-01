@@ -17,7 +17,7 @@ drawings:
 
 # Solid 2.0
 
-<div class="lead">A truely innovate update in<br>handling async state</div>
+<div class="lead">A truly innovate update in<br>handling async state</div>
 
 <div class="credit mt-8">
   <a href="https://nickbreaton.com" target="_blank">Nick Breaton</a>
@@ -283,7 +283,12 @@ layoutClass: gap-8
 
 <WordHighlight word="{user().name}" :until="2">
 
-```tsx {all|all|7,9}
+```tsx {all|all|7,9} twoslash
+// @jsx: preserve
+// @jsxImportSource: @solidjs/web
+import { createMemo, Loading } from 'solid-js'
+import { fetchUser } from './demos/api'
+// ---cut---
 function App(props) {
   const user = createMemo(
     () => fetchUser(props.userId)
@@ -422,7 +427,12 @@ layoutClass: gap-8
 
 <div class="code-label" data-framework="solid">
 
-```tsx {2-3|10-12|7|13|all}
+```tsx {2-3|10-12|7|13|all} twoslash
+// @jsx: preserve
+// @jsxImportSource: @solidjs/web
+import { createMemo, createSignal, isPending, latest, Loading } from 'solid-js'
+import { fetchUser } from './demos/api'
+// ---cut---
 function App() {
   const [userId, setUserId] = createSignal(1);
   const user = createMemo(() => fetchUser(userId()));

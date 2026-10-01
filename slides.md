@@ -102,13 +102,13 @@ layoutClass: gap-8
 zoom: 0.75
 ---
 
-# The _component_ tree becomes the request graph
+# The _component tree_ becomes the request graph
 
 ::left::
 
 <div class="code-label" data-framework="react">
 
-```tsx
+```tsx {all|10-13|2-5|24,26}
 function Posts({ userId }) {
   const { data: posts } = useSuspenseQuery({
     queryKey: ["posts", userId],
@@ -154,7 +154,7 @@ layoutClass: gap-8
 zoom: 0.68
 ---
 
-# React can fix it
+# Hoist data fetching to fix
 
 ::left::
 
@@ -215,6 +215,8 @@ layoutClass: gap-8
 
 <div class="code-label" data-framework="solid">
 
+<WordHighlight :word="['{count()}', '{doubled()}']" within="{count()} × 2 = {doubled()}" :at="5">
+
 ````md magic-move
 ```tsx {2|4|6-10|all}
 function Counter() {
@@ -230,7 +232,7 @@ function Counter() {
 }
 ```
 
-```tsx {6}
+```tsx {6|all}
 function Counter() {
   const [count, setCount] = createSignal(0);
 
@@ -247,6 +249,8 @@ function Counter() {
 ```
 ````
 
+</WordHighlight>
+
 </div>
 
 ::right::
@@ -260,13 +264,15 @@ layout: two-cols-header
 layoutClass: gap-8
 ---
 
-# Async is just a computation
+# Signals suspend transparently
 
 ::left::
 
 <div class="code-label" data-framework="solid">
 
-```tsx
+<WordHighlight word="{user().name}" :until="2">
+
+```tsx {all|all|7,9}
 function App(props) {
   const user = createMemo(
     () => fetchUser(props.userId)
@@ -279,6 +285,8 @@ function App(props) {
   );
 }
 ```
+
+</WordHighlight>
 
 </div>
 
@@ -294,15 +302,56 @@ layoutClass: gap-8
 zoom: 0.75
 ---
 
-# Same tree, no waterfall
+# The _signals_ becomes the request graph
 
 ::left::
 
 <div class="code-label" data-framework="solid">
 
-```tsx {24-26|13|17|2}
+````md magic-move {lines: true}
+```tsx
+function App(props) {
+  const user = createMemo(() => fetchUser(props.userId));
+  const posts = createMemo(() => fetchPosts(props.userId));
+  return (
+    <Loading fallback={<p>Loading...</p>}>
+      <p>{user().name}</p>
+      <ul>
+        <For each={posts()}>
+          {(p) => <li>{p.title}</li>}
+        </For>
+      </ul>
+    </Loading>
+  );
+}
+```
+
+```tsx
 function Posts(props) {
-  const posts = createMemo(() => fetchPosts(props.id));
+  const posts = createMemo(() => fetchPosts(props.userId));
+  return (
+    <ul>
+      <For each={posts()}>
+        {(p) => <li>{p.title}</li>}
+      </For>
+    </ul>
+  );
+}
+
+function App(props) {
+  const user = createMemo(() => fetchUser(props.userId));
+  return (
+    <Loading fallback={<p>Loading...</p>}>
+      <p>{user().name}</p>
+      <Posts userId={props.userId} />
+    </Loading>
+  );
+}
+```
+
+```tsx
+function Posts(props) {
+  const posts = createMemo(() => fetchPosts(props.userId));
   return (
     <ul>
       <For each={posts()}>
@@ -313,11 +362,11 @@ function Posts(props) {
 }
 
 function User(props) {
-  const user = createMemo(() => fetchUser(props.id));
+  const user = createMemo(() => fetchUser(props.userId));
   return (
     <>
       <p>{user().name}</p>
-      <Posts id={props.id} />
+      <Posts userId={props.userId} />
     </>
   );
 }
@@ -325,26 +374,31 @@ function User(props) {
 function App(props) {
   return (
     <Loading fallback={<p>Loading...</p>}>
-      <User id={props.id} />
+      <User userId={props.userId} />
     </Loading>
   );
 }
 ```
+````
 
 </div>
 
 ::right::
 
 <div>
-  <Demo name="solid/Posts" :height="88" />
+  <Demo :name="['solid/PostsSingle', 'solid/PostsSplit', 'solid/Posts'][Math.min($clicks, 2)]" :height="88" />
   <Network :scale="2400" />
 </div>
+
+<v-click at="3">
 
 <div class="mt-8 opacity-70">
 
 Reading a value that isn't ready doesn't stop the rest of the tree from being built.
 
 </div>
+
+</v-click>
 
 ---
 layout: two-cols-header
@@ -611,4 +665,3 @@ SSR'd from a cookie, hydrated, live-updated from Cookie Store events, optimistic
 
 </div>
 </div>
-

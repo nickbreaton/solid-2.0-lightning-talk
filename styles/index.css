@@ -115,3 +115,6 @@
 
 /* Keep code and demo columns equal width even when a code line is long. */
 .slidev-layout.two-cols-header { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+/* <WordHighlight>: everything but the matched words, once active. */
+::highlight(word-dim) { color: rgb(128 128 128 / 0.4); }

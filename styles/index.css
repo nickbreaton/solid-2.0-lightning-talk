@@ -1,0 +1,116 @@
+:root {
+  --solid: #4f88c6;
+  --react: #58c4dc;
+  --pending-opacity: 0.45;
+}
+
+.slidev-layout h1 { font-weight: 700; letter-spacing: -0.02em; }
+.slidev-layout .lead { font-size: 1.4rem; opacity: 0.8; }
+.slidev-layout .quote { font-size: 1.6rem; line-height: 1.35; font-weight: 600; }
+.tag-solid { color: var(--solid); font-weight: 700; }
+.tag-react { color: var(--react); font-weight: 700; }
+
+/* ------------------------------------------------------------ demo frame */
+
+/* Code labels take a fixed 1.5rem (line + gap); demo frames get the same top
+   margin so their tops line up with the code blocks beside them. */
+:root { --code-label-space: 1.5rem; }
+
+.demo-frame {
+  position: relative;
+  margin-top: var(--code-label-space);
+  border-radius: var(--slidev-code-radius);
+  padding: 1rem;
+  background: var(--slidev-code-background);
+}
+.code-label::before {
+  display: block;
+  height: 1rem;
+  line-height: 1rem;
+  margin-bottom: calc(var(--code-label-space) - 1rem);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.code-label[data-framework='solid']::before { content: 'Solid'; color: var(--solid); }
+.code-label[data-framework='react']::before { content: 'React'; color: var(--react); }
+.demo-replay {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.5rem;
+  opacity: 0.5;
+  font-size: 0.9rem;
+}
+.demo-replay:hover { opacity: 1; }
+
+.demo { font-size: 1rem; }
+.demo .stack { display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+.demo .row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.demo .card {
+  min-width: 18rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--slidev-code-radius);
+  background: rgb(128 128 128 / 0.12);
+  transition: opacity 150ms;
+}
+.demo .skeleton { opacity: 0.6; font-style: italic; }
+.demo .pending { opacity: var(--pending-opacity); }
+.demo .muted { opacity: 0.6; font-size: 0.85em; }
+.demo button {
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgb(128 128 128 / 0.5);
+  background: rgb(128 128 128 / 0.12);
+}
+.demo button:hover { background: rgb(128 128 128 / 0.25); }
+.demo input, .demo select {
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid rgb(128 128 128 / 0.5);
+  background: transparent;
+  color: inherit;
+  min-width: 14rem;
+  transition: opacity 150ms;
+}
+.demo select option { color: black; }
+.demo .comments { margin: 0.5rem 0 0; padding-left: 1rem; font-size: 0.9em; }
+.demo .comments li { margin: 0.2rem 0; }
+.demo .cascade {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 0.75rem 1rem;
+  align-items: center;
+}
+.demo .cascade label { font-weight: 600; }
+
+/* ------------------------------------------------------------ network */
+
+.network {
+  margin-top: 1rem;
+  font-family: var(--slidev-code-font-family, monospace);
+  font-size: 0.75rem;
+}
+.network-title { opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+.network-empty { opacity: 0.4; }
+.network-row { display: grid; grid-template-columns: 8rem 1fr; align-items: center; height: 1.3rem; }
+.network-label { opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.network-track { position: relative; height: 0.6rem; }
+.network-bar { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: #22c55e; }
+.network-bar.inflight { background: #eab308; }
+
+/* ------------------------------------------------------------ diagrams */
+
+.graph {
+  font-family: var(--slidev-code-font-family, monospace);
+  line-height: 1.5;
+  white-space: pre;
+  font-size: 0.95rem;
+}
+.closing-grid { display: grid; grid-template-columns: auto auto; gap: 0.6rem 2rem; font-size: 1.5rem; }
+.closing-grid b { letter-spacing: 0.08em; }
+
+.slidev-layout.two-cols-header h1 { margin-bottom: 0.5rem; }
+
+/* Keep code and demo columns equal width even when a code line is long. */
+.slidev-layout.two-cols-header { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }

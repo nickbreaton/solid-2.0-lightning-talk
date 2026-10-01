@@ -1,0 +1,23 @@
+{
+  "name": "solid-2.0-lightning-talk",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^53.0.0",
+    "@slidev/theme-default": "latest",
+    "@slidev/theme-seriph": "latest",
+    "@solidjs/web": "2.0.0-rc.13",
+    "@tanstack/react-query": "^5.104.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "solid-js": "2.0.0-rc.13",
+    "vite-plugin-solid": "3.0.0-next.27",
+    "vue": "^3.5.33"
+  }
+}

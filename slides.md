@@ -19,6 +19,12 @@ drawings:
 
 <div class="lead">A truely innovate update in<br>handling async state</div>
 
+<div class="credit mt-8">
+  <a href="https://nickbreaton.com" target="_blank">Nick Breaton</a>
+  <br>
+  <a href="https://x.com/nickbreaton" target="_blank">@nickbreaton</a>
+</div>
+
 
 ---
 layout: two-cols-header

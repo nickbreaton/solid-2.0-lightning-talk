@@ -118,3 +118,8 @@
 
 /* <WordHighlight>: everything but the matched words, once active. */
 ::highlight(word-dim) { color: rgb(128 128 128 / 0.4); }
+
+/* Title slide byline */
+.credit { font-size: 0.9rem; opacity: 0.45; }
+.credit a { border-bottom: none !important; color: inherit; }
+.credit a:hover { opacity: 1; text-decoration: underline; }

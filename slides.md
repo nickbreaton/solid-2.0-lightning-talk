@@ -1,7 +1,7 @@
 ---
 theme: default
 colorSchema: dark
-title: Async Belongs in the Graph
+title: Solid 2.0
 info: |
   A five-minute lightning talk on Solid 2.0's async model.
   Demos run live: React 19 + TanStack Query, and Solid 2.0 RC.
